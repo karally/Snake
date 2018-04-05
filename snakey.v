@@ -44,7 +44,6 @@ module snakey(
     .x(x),
     .y(y),
     .plot(writeEn),
-    /* Signals for the DAC to drive the monitor. */
     .VGA_R(VGA_R),
     .VGA_G(VGA_G),
     .VGA_B(VGA_B),
@@ -66,7 +65,7 @@ module snakey(
   wire [1:0] direction;
   wire [7:0] score;
   
-  keyboard_tracker #(.PULSE_OR_HOLD(0)) keyboard(.clock(CLOCK_50),
+  keyboard_tracker #(.PULSE_OR_HOLD(0)) keyboard(	.clock(CLOCK_50),
 							.reset(resetn),
   							.PS2_CLK(PS2_CLK),
   							.PS2_DAT(PS2_DAT),
@@ -76,10 +75,10 @@ module snakey(
   							.down(down));
   							
   wire veryslow, slow, fast, veryfast;
-  rate_divider rd1(CLOCK_50, 26'd12999999, 	veryslow); 	// slower
-  rate_divider rd2(CLOCK_50, 26'd6499999, 	slow); 		// slow
-  rate_divider rd3(CLOCK_50, 26'd4249999, 	fast); 		// fast-ish
-  rate_divider rd4(CLOCK_50, 26'd699999,  	veryfast); 	// fast!
+  rate_divider rd1(CLOCK_50, 26'd12999999, veryslow); 	// slower
+  rate_divider rd2(CLOCK_50, 26'd6499999,  slow); 		// slow
+  rate_divider rd3(CLOCK_50, 26'd4249999,  fast); 		// fast-ish
+  rate_divider rd4(CLOCK_50, 26'd699999,   veryfast); 	// fast!
 
   wire speed;
   mux4to1 gameMux(
@@ -103,7 +102,7 @@ module snakey(
     .direction(direction),
     .state(state),
     .writeEn(writeEn),
-	.gameover(gameover)
+    .gameover(gameover)
   );
 
   datapath data(
@@ -117,7 +116,7 @@ module snakey(
     .y(y),
     .colour(colour),
     .score(score),
-	.gameover(gameover)
+    .gameover(gameover)
   );
   hex_decoder score_hex(score[3:0], HEX0);
 endmodule
@@ -132,17 +131,14 @@ module controller(
   output [2:0] state,
   output reg writeEn
   );
-  
   reg [2:0] current_state, next_state;
-  
   localparam	INITIAL_	= 3'b000,
-  				UPDATE_HEAD	= 3'b001,
-				ERASE_TAIL	= 3'b010,
-				MOVE       	= 3'b100,
-			  	CHECK_WALLS	= 3'b101,
-              	DRAW_APPLE  = 3'b110,
-	            END_CYCLE   = 3'b111;
-	            
+  		UPDATE_HEAD	= 3'b001,
+		ERASE_TAIL	= 3'b010,
+		MOVE       	= 3'b100,
+		CHECK_WALLS	= 3'b101,
+              	DRAW_APPLE  	= 3'b110,
+	        END_CYCLE   	= 3'b111;
   localparam  LEFT  = 2'b00,
               UP    = 2'b01,
               DOWN  = 2'b10,
@@ -156,14 +152,14 @@ module controller(
   always @(posedge clkin)
   begin: state_table
     case (current_state)
-	  INITIAL_:			next_state <= speed ? UPDATE_HEAD : INITIAL_;
-      UPDATE_HEAD:  	next_state <= ERASE_TAIL;
-      ERASE_TAIL:       next_state <= MOVE;
-      MOVE:        		next_state <= CHECK_WALLS;
-      CHECK_WALLS:		next_state <= DRAW_APPLE;
-      DRAW_APPLE:      	next_state <= END_CYCLE;
-      END_CYCLE:        next_state <= speed ? INITIAL_: END_CYCLE;
-      default:          next_state <= END_CYCLE;
+	INITIAL_:	next_state <= speed ? UPDATE_HEAD : INITIAL_;
+      	UPDATE_HEAD:  	next_state <= ERASE_TAIL;
+      	ERASE_TAIL:     next_state <= MOVE;
+      	MOVE:        	next_state <= CHECK_WALLS;
+      	CHECK_WALLS:	next_state <= DRAW_APPLE;
+      	DRAW_APPLE:     next_state <= END_CYCLE;
+      	END_CYCLE:      next_state <= speed ? INITIAL_: END_CYCLE;
+      	default:        next_state <= END_CYCLE;
     endcase
   end
   
@@ -227,12 +223,12 @@ module datapath(
 
   // constants for FSM stategameclks
   localparam	INITIAL_	= 3'b000,
-  				UPDATE_HEAD = 3'b001,
-				ERASE_TAIL	= 3'b010,
-				MOVE       	= 3'b100,
-			  	CHECK_WALLS	= 3'b101,
-              	DRAW_APPLE  = 3'b110,
-	            END_CYCLE   = 3'b111;
+  		UPDATE_HEAD 	= 3'b001,
+		ERASE_TAIL	= 3'b010,
+		MOVE       	= 3'b100,
+		CHECK_WALLS	= 3'b101,
+              	DRAW_APPLE  	= 3'b110,
+	        END_CYCLE   	= 3'b111;
   localparam  UP  	= 2'b00,
               DOWN  = 2'b01,
               LEFT  = 2'b10,
@@ -261,7 +257,7 @@ module datapath(
       appleX <= 50; appleY <= 50;
       x <= appleX; y <= appleY;
       score <= 0; gameover <= 0; if_init <= 1;
-	  enable1 <= 0; enable2 <= 0;
+      enable1 <= 0; enable2 <= 0;
     end
 
 	if (state == INITIAL_) begin
